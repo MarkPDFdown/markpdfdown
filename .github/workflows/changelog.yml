@@ -1,10 +1,9 @@
-name: Changelog CI
+name: Deploy
 
 on:
-
-  pull_request:
-    types: [ opened ]
-
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
     inputs:
       release_version:
@@ -13,16 +12,33 @@ on:
         default: '1.0.0'
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Run Changelog CI
-        uses: saadmk11/changelog-ci@v1.1.2
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
         with:
-          changelog_filename: CHANGELOG.md
-          committer_username: 'github-actions[bot]'
-          committer_email: 'github-actions[bot]@users.noreply.github.com'
-          release_version: ${{ github.event.inputs.release_version }}
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          allowUpdates: true
+          draft: true
+          makeLatest: false
+          name: ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.changes }}
+          token: ${{ github.token }}
+
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: main
+          commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
+          file_pattern: CHANGELOG.md

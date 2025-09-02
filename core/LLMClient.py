@@ -30,6 +30,7 @@ class LLMClient:
         image_paths: Optional[list[str]] = None,
         temperature: float = 0.7,
         max_tokens: int = 8192,
+        reasoning_effort: Optional[str] = None,
     ) -> str:
         """
         Create chat dialogue (supports multimodal)
@@ -71,11 +72,14 @@ class LLMClient:
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
+                reasoning_effort=reasoning_effort,
                 extra_headers={
                     "X-Title": "MarkPDFdown",
                     "HTTP-Referer": "https://github.com/MarkPDFdown/markpdfdown.git",
                 },
             )
+            if not response.choices:
+                raise Exception("No response from API")
             return response.choices[0].message.content
 
         except Exception as e:

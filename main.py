@@ -28,6 +28,7 @@ def completion(
     temperature=0.5,
     max_tokens=8192,
     retry_times=3,
+    reasoning_effort=None,
 ):
     """
     Call OpenAI's completion interface for text generation
@@ -39,6 +40,8 @@ def completion(
         image_paths (List[str], optional): List of image paths, defaults to None
         temperature (float, optional): Temperature for text generation, defaults to 0.5
         max_tokens (int, optional): Maximum number of tokens for generated text, defaults to 8192
+        retry_times (int, optional): Number of retries, defaults to 3
+        reasoning_effort (str, optional): Reasoning effort, defaults to None
     Returns:
         str: Generated text content
     """
@@ -57,6 +60,11 @@ def completion(
         model = os.getenv("OPENAI_DEFAULT_MODEL")
         if not model:
             model = "gpt-4o"
+    
+    if not reasoning_effort:
+        reasoning_effort = os.getenv("OPENAI_REASONING_EFFORT")
+        if not reasoning_effort:
+            reasoning_effort = None
 
     # Initialize LLMClient
     client = LLMClient.LLMClient(base_url=base_url, api_key=api_key, model=model)
@@ -69,6 +77,7 @@ def completion(
                 image_paths=image_paths,
                 temperature=temperature,
                 max_tokens=max_tokens,
+                reasoning_effort=reasoning_effort,
             )
             return response
         except Exception as e:

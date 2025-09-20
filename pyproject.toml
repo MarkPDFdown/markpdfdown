@@ -1,6 +1,6 @@
 [project]
 name = "markpdfdown"
-version = "1.1.0"
+version = "1.1.1"
 description = "Convert PDF files and images to Markdown format using multimodal LLMs"
 readme = "README.md"
 requires-python = ">=3.9"

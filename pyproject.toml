@@ -1,27 +1,54 @@
 [project]
 name = "markpdfdown"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.1.0"
+description = "Convert PDF files and images to Markdown format using multimodal LLMs"
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = [
-    "openai==1.66.3",
-    "pymupdf==1.25.3",
-    "pypdf2==3.0.1",
-    "python-dotenv>=1.1.0",
+authors = [
+    {name = "MarkPDFDown Team", email = "jorbenzhu@gmail.com"}
 ]
+license = {text = "Apache-2.0"}
+keywords = ["pdf", "markdown", "llm", "multimodal", "conversion"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing :: Markup",
+    "Topic :: Multimedia :: Graphics",
+]
+
+dependencies = [
+    "litellm>=1.0.0",
+    "pymupdf>=1.25.3",
+    "pypdf2>=3.0.1",
+    "python-dotenv>=1.1.0",
+    "pydantic>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/MarkPDFdown/markpdfdown"
+Repository = "https://github.com/MarkPDFdown/markpdfdown.git"
+Issues = "https://github.com/MarkPDFdown/markpdfdown/issues"
+
+[project.scripts]
+markpdfdown = "markpdfdown.cli:main"
 
 [dependency-groups]
 dev = [
     "pre-commit>=4.2.0",
-    "pytest==8.3.5",
+    "pytest>=8.3.5",
     "ruff>=0.11.11",
 ]
 
-# Ruff 配置
+# Ruff configuration
 [tool.ruff]
 line-length = 88
-target-version = "py313"
+target-version = "py39"
 
 [tool.ruff.lint]
 select = [
@@ -50,7 +77,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["markpdfdown"]
-
-[tool.hatch.build.targets.wheel.force-include]
-"." = "."
+packages = ["src/markpdfdown"]

@@ -250,7 +250,7 @@ Please ensure your code follows the project's coding standards by running the li
 
 ## Changelog
 
-### v0.2.0 (Latest)
+### v1.1.0 (Latest)
 - **Breaking Changes**: Complete architecture refactor
 - **New**: LiteLLM integration for multi-provider support
 - **New**: Unified CLI with `--input`/`--output` parameters
@@ -259,9 +259,6 @@ Please ensure your code follows the project's coding standards by running the li
 - **New**: OpenRouter support alongside OpenAI
 - **Improved**: Modular codebase with better separation of concerns
 - **Improved**: Enhanced error handling and logging
-
-### v0.1.0
-- Initial release with basic PDF to Markdown conversion
 
 ## License
 This project is licensed under the Apache License 2.0. See the LICENSE file for details.

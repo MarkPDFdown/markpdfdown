@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.0] - 2025-09-20
+### :recycle: Refactors
+- [`da51adf`](https://github.com/MarkPDFdown/markpdfdown/commit/da51adf932ffaf05e17d7324ccddbdad8f9f8500) - The project was comprehensively refactored, with litellm introduced as the LLM client library, and input/output parameters were optimized. *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## 1.0.0
 
 > 15 March 2025
@@ -70,3 +75,4 @@
 - [`af25adb`](https://github.com/MarkPDFdown/markpdfdown/commit/af25adbea39dd57f155e7d6feeb9dd18ade68495) - Add reasoning_effort parameter support *(commit by [@jorben](https://github.com/jorben))*
 
 [1.0.11]: https://github.com/MarkPDFdown/markpdfdown/compare/1.0.10...1.0.11
+[1.1.0]: https://github.com/MarkPDFdown/markpdfdown/compare/1.0.11...1.1.0

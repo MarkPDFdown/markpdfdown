@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.2] - 2025-09-20
+### :bug: Bug Fixes
+- [`c5d1a6a`](https://github.com/MarkPDFdown/markpdfdown/commit/c5d1a6a02c4e89e7b609dd3df275f13659b2d917) - Fix missing RUST compiler issue when building fastuuid in CI environment *(commit by [@jorben](https://github.com/jorben))*
+
+### :wrench: Chores
+- [`fbb1a6d`](https://github.com/MarkPDFdown/markpdfdown/commit/fbb1a6d4b8434468c950cac6d3180c80eae7e741) - update version *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [1.1.1] - 2025-09-20
 ### :bug: Bug Fixes
 - [`7bf7005`](https://github.com/MarkPDFdown/markpdfdown/commit/7bf70053d33999ab56cfca27576bd7f6676c91d5) - update dockerfile, fix uv path issue *(commit by [@jorben](https://github.com/jorben))*
@@ -97,3 +105,4 @@
 
 
 
+[1.1.2]: https://github.com/MarkPDFdown/markpdfdown/compare/1.1.1...1.1.2

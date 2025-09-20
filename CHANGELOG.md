@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1] - 2025-09-20
+### :bug: Bug Fixes
+- [`7bf7005`](https://github.com/MarkPDFdown/markpdfdown/commit/7bf70053d33999ab56cfca27576bd7f6676c91d5) - update dockerfile, fix uv path issue *(commit by [@jorben](https://github.com/jorben))*
+
+### :wrench: Chores
+- [`ff966b4`](https://github.com/MarkPDFdown/markpdfdown/commit/ff966b4ffb4a79316e5b411075d22a4e20211a49) - update version *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [1.1.0] - 2025-09-20
 ### :recycle: Refactors
 - [`da51adf`](https://github.com/MarkPDFdown/markpdfdown/commit/da51adf932ffaf05e17d7324ccddbdad8f9f8500) - The project was comprehensively refactored, with litellm introduced as the LLM client library, and input/output parameters were optimized. *(commit by [@jorben](https://github.com/jorben))*
@@ -76,3 +84,4 @@
 
 [1.0.11]: https://github.com/MarkPDFdown/markpdfdown/compare/1.0.10...1.0.11
 [1.1.0]: https://github.com/MarkPDFdown/markpdfdown/compare/1.0.11...1.1.0
+[1.1.1]: https://github.com/MarkPDFdown/markpdfdown/compare/1.1.0...1.1.1

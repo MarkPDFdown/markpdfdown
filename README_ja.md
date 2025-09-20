@@ -15,15 +15,17 @@
 
 ## 概要
 
-MarkPDFDownは、PDF文書をクリーンで編集可能なMarkdownテキストに変換するプロセスを簡素化するために設計されています。高度なマルチモーダルAIモデルを活用することで、テキストを正確に抽出し、書式を保持し、表、数式、図表を含む複雑な文書構造を処理できます。
+MarkPDFDownは、PDF文書をクリーンで編集可能なMarkdownテキストに変換するプロセスを簡素化するために設計されています。LiteLLMを通じて高度なマルチモーダルAIモデルを活用することで、テキストを正確に抽出し、書式を保持し、表、数式、図表を含む複雑な文書構造を処理できます。
 
 ## 機能
 
 - **PDFからMarkdownへの変換**: あらゆるPDF文書を適切にフォーマットされたMarkdownに変換
 - **画像からMarkdownへの変換**: 画像を適切にフォーマットされたMarkdownに変換
-- **マルチモーダル理解**: AIを活用して文書の構造と内容を理解
+- **マルチプロバイダーサポート**: LiteLLMを通じてOpenAIとOpenRouterをサポート
+- **柔軟なCLI**: ファイルベースとパイプベースの両方の使用モードをサポート
 - **書式の保持**: 見出し、リスト、表、その他の書式要素を維持
-- **カスタマイズ可能なモデル**: ニーズに合わせてモデルを設定可能
+- **ページ範囲選択**: PDF文書から特定のページ範囲を変換
+- **モジュラーアーキテクチャ**: 関心の分離による清潔で保守性の高いコードベース
 
 ## デモ
 ![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/demo_02.png)
@@ -43,6 +45,8 @@ cd markpdfdown
 # 依存関係をインストールし、仮想環境を作成
 uv sync
 
+# パッケージを開発モードでインストール
+uv pip install -e .
 ```
 
 ### condaを使用
@@ -58,29 +62,106 @@ cd markpdfdown
 # 依存関係をインストール
 pip install -e .
 ```
-## 使用方法
+
+## 設定
+
+MarkPDFDownは設定に環境変数を使用します。プロジェクトディレクトリに`.env`ファイルを作成してください：
+
 ```bash
-# OpenAI APIキーを設定
-export OPENAI_API_KEY="your-api-key"
-# オプション：OpenAI APIベースを設定
-export OPENAI_API_BASE="your-api-base"
-# オプション：OpenAI APIモデルを設定
-export OPENAI_DEFAULT_MODEL="your-model"
-
-# PDFからMarkdownへ
-python main.py < tests/input.pdf > output.md
-
-# 画像からMarkdownへ
-python main.py < input_image.png > output.md
+# サンプル設定をコピー
+cp .env.sample .env
 ```
-## 高度な使用方法
+
+`.env`ファイルを編集して設定を行います：
+
 ```bash
-python main.py page_start page_end < tests/input.pdf > output.md
+# モデル設定
+MODEL_NAME=gpt-4o
+
+# APIキー（LiteLLMが自動的に検出します）
+OPENAI_API_KEY=your-openai-api-key
+# またはOpenRouterの場合
+OPENROUTER_API_KEY=your-openrouter-api-key
+
+# オプションパラメータ
+TEMPERATURE=0.3
+MAX_TOKENS=8192
+RETRY_TIMES=3
+```
+
+### サポートされているモデル
+
+#### OpenAIモデル
+```bash
+MODEL_NAME=gpt-4o
+MODEL_NAME=gpt-4o-mini
+MODEL_NAME=gpt-4-vision-preview
+```
+
+#### OpenRouterモデル
+```bash
+MODEL_NAME=openrouter/anthropic/claude-3.5-sonnet
+MODEL_NAME=openrouter/google/gemini-pro-vision
+MODEL_NAME=openrouter/meta-llama/llama-3.2-90b-vision
+```
+
+## 使用方法
+
+### ファイルモード（推奨）
+
+```bash
+# 基本的な変換
+markpdfdown --input document.pdf --output output.md
+
+# 特定のページ範囲を変換
+markpdfdown --input document.pdf --output output.md --start 1 --end 10
+
+# 画像をMarkdownに変換
+markpdfdown --input image.png --output output.md
+
+# Pythonモジュールを使用
+python -m markpdfdown --input document.pdf --output output.md
+```
+
+### パイプモード（Docker対応）
+
+```bash
+# パイプを介したPDFからMarkdownへの変換
+markpdfdown < document.pdf > output.md
+
+# Pythonモジュールを使用
+python -m markpdfdown < document.pdf > output.md
+```
+
+### 高度な使用方法
+
+```bash
+# PDFの5〜15ページを変換
+markpdfdown --input large_document.pdf --output chapter.md --start 5 --end 15
+
+# 複数のファイルを処理
+for file in *.pdf; do
+    markpdfdown --input "$file" --output "${file%.pdf}.md"
+done
 ```
 
 ## Dockerの使用
+
 ```bash
-docker run -i -e OPENAI_API_KEY=your-api-key -e OPENAI_API_BASE=your-api-base -e OPENAI_DEFAULT_MODEL=your-model jorbenzhu/markpdfdown < input.pdf > output.md
+# イメージをビルド（必要な場合）
+docker build -t markpdfdown .
+
+# 環境変数を使用して実行
+docker run -i \
+  -e MODEL_NAME=gpt-4o \
+  -e OPENAI_API_KEY=your-api-key \
+  markpdfdown < input.pdf > output.md
+
+# OpenRouterを使用
+docker run -i \
+  -e MODEL_NAME=openrouter/anthropic/claude-3.5-sonnet \
+  -e OPENROUTER_API_KEY=your-openrouter-key \
+  markpdfdown < input.pdf > output.md
 ```
 
 ## 開発セットアップ
@@ -126,7 +207,24 @@ ruff check --fix
 - Python 3.9+
 - [uv](https://astral.sh/uv/)（パッケージ管理に推奨）またはconda/pip
 - `pyproject.toml`で指定された依存関係
-- 指定されたマルチモーダルAIモデルへのアクセス
+- サポートされているLLMプロバイダー（OpenAIまたはOpenRouter）へのアクセス
+
+## アーキテクチャ
+
+このプロジェクトはモジュラーアーキテクチャに従っています：
+
+```
+src/markpdfdown/
+├── __init__.py          # パッケージ初期化
+├── __main__.py          # python -m のエントリーポイント
+├── cli.py               # コマンドラインインターフェース
+├── main.py              # コア変換ロジック
+├── config.py            # 設定管理
+└── core/                # コアモジュール
+    ├── llm_client.py    # LiteLLM統合
+    ├── file_worker.py   # ファイル処理
+    └── utils.py         # ユーティリティ関数
+```
 
 ## 貢献
 貢献を歓迎します！お気軽にプルリクエストを送信してください。
@@ -150,10 +248,23 @@ ruff check --fix
 
 提出前にリンティングとフォーマットツールを実行して、プロジェクトのコーディング標準に従っていることを確認してください。
 
+## 変更履歴
+
+### v1.1.0（最新）
+- **破壊的変更**: アーキテクチャの完全なリファクタリング
+- **新機能**: マルチプロバイダーサポートのためのLiteLLM統合
+- **新機能**: `--input`/`--output`パラメータを持つ統一CLI
+- **新機能**: `python -m markpdfdown`実行のサポート
+- **新機能**: `.env`サポートを含む環境ベースの設定
+- **新機能**: OpenAIに加えてOpenRouterのサポート
+- **改善**: 関心の分離が改善されたモジュラーコードベース
+- **改善**: エラー処理とロギングの強化
+
 ## ライセンス
 このプロジェクトはApache License 2.0の下でライセンスされています。詳細はLICENSEファイルを参照してください。
 
 ## 謝辞
+- 統一されたLLMアクセスを提供するLiteLLMの開発者に感謝します
 - このツールを支えるマルチモーダルAIモデルの開発者に感謝します
 - より良いPDFからMarkdownへの変換ツールの必要性に触発されました
 

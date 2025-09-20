@@ -17,15 +17,17 @@
 
 ## نظرة عامة
 
-تم تصميم MarkPDFDown لتبسيط عملية تحويل مستندات PDF إلى نص Markdown نظيف وقابل للتعديل. من خلال الاستفادة من نماذج الذكاء الاصطناعي متعددة الوسائط المتقدمة، يمكنها استخراج النص بدقة، والحفاظ على التنسيق، والتعامل مع هياكل المستندات المعقدة بما في ذلك الجداول والصيغ والرسوم البيانية.
+تم تصميم MarkPDFDown لتبسيط عملية تحويل مستندات PDF إلى نص Markdown نظيف وقابل للتعديل. من خلال الاستفادة من نماذج الذكاء الاصطناعي متعددة الوسائط المتقدمة عبر LiteLLM، يمكنها استخراج النص بدقة، والحفاظ على التنسيق، والتعامل مع هياكل المستندات المعقدة بما في ذلك الجداول والصيغ والرسوم البيانية.
 
 ## المميزات
 
 - **تحويل PDF إلى Markdown**: تحويل أي مستند PDF إلى Markdown منسق بشكل جيد
 - **تحويل الصور إلى Markdown**: تحويل الصور إلى Markdown منسق بشكل جيد
-- **الفهم متعدد الوسائط**: يستفيد من الذكاء الاصطناعي لفهم هيكل المستند ومحتواه
+- **دعم متعدد المزودين**: يدعم OpenAI وOpenRouter من خلال LiteLLM
+- **واجهة سطر أوامر مرنة**: أوضاع استخدام تعتمد على الملفات والأنابيب
 - **الحفاظ على التنسيق**: يحافظ على العناوين والقوائم والجداول وعناصر التنسيق الأخرى
-- **نموذج قابل للتخصيص**: قم بتكوين النموذج ليناسب احتياجاتك
+- **اختيار نطاق الصفحات**: تحويل نطاقات صفحات محددة من مستندات PDF
+- **بنية معمارية نمطية**: قاعدة شيفرة نظيفة وقابلة للصيانة مع فصل المسؤوليات
 
 ## عرض توضيحي
 ![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/demo_02.png)
@@ -47,6 +49,8 @@ cd markpdfdown
 # تثبيت التبعيات وإنشاء بيئة افتراضية
 uv sync
 
+# تثبيت الحزمة في وضع التطوير
+uv pip install -e .
 ```
 
 <div dir="rtl">
@@ -69,33 +73,114 @@ pip install -e .
 
 <div dir="rtl">
 
-## الاستخدام
+## التكوين
+
+يستخدم MarkPDFDown متغيرات البيئة للتكوين. قم بإنشاء ملف `.env` في دليل مشروعك:
 
 </div>
 
 ```bash
-# إعداد مفتاح OpenAI API الخاص بك
-export OPENAI_API_KEY="your-api-key"
-# اختياري: إعداد قاعدة OpenAI API
-export OPENAI_API_BASE="your-api-base"
-# اختياري: إعداد نموذج OpenAI API
-export OPENAI_DEFAULT_MODEL="your-model"
-
-# PDF إلى Markdown
-python main.py < tests/input.pdf > output.md
-
-# صورة إلى Markdown
-python main.py < input_image.png > output.md
+# نسخ التكوين النموذجي
+cp .env.sample .env
 ```
 
 <div dir="rtl">
 
-## الاستخدام المتقدم
+قم بتحرير ملف `.env` بإعداداتك:
 
 </div>
 
 ```bash
-python main.py page_start page_end < tests/input.pdf > output.md
+# تكوين النموذج
+MODEL_NAME=gpt-4o
+
+# مفاتيح API (يكتشفها LiteLLM تلقائيًا)
+OPENAI_API_KEY=your-openai-api-key
+# أو لـ OpenRouter
+OPENROUTER_API_KEY=your-openrouter-api-key
+
+# معلمات اختيارية
+TEMPERATURE=0.3
+MAX_TOKENS=8192
+RETRY_TIMES=3
+```
+
+<div dir="rtl">
+
+### النماذج المدعومة
+
+#### نماذج OpenAI
+
+</div>
+
+```bash
+MODEL_NAME=gpt-4o
+MODEL_NAME=gpt-4o-mini
+MODEL_NAME=gpt-4-vision-preview
+```
+
+<div dir="rtl">
+
+#### نماذج OpenRouter
+
+</div>
+
+```bash
+MODEL_NAME=openrouter/anthropic/claude-3.5-sonnet
+MODEL_NAME=openrouter/google/gemini-pro-vision
+MODEL_NAME=openrouter/meta-llama/llama-3.2-90b-vision
+```
+
+<div dir="rtl">
+
+## الاستخدام
+
+### وضع الملف (موصى به)
+
+</div>
+
+```bash
+# التحويل الأساسي
+markpdfdown --input document.pdf --output output.md
+
+# تحويل نطاق صفحات محدد
+markpdfdown --input document.pdf --output output.md --start 1 --end 10
+
+# تحويل صورة إلى markdown
+markpdfdown --input image.png --output output.md
+
+# استخدام وحدة python
+python -m markpdfdown --input document.pdf --output output.md
+```
+
+<div dir="rtl">
+
+### وضع الأنبوب (متوافق مع Docker)
+
+</div>
+
+```bash
+# PDF إلى markdown عبر الأنبوب
+markpdfdown < document.pdf > output.md
+
+# استخدام وحدة python
+python -m markpdfdown < document.pdf > output.md
+```
+
+<div dir="rtl">
+
+### الاستخدام المتقدم
+
+</div>
+
+```bash
+# تحويل الصفحات 5-15 من PDF
+markpdfdown --input large_document.pdf --output chapter.md --start 5 --end 15
+
+# معالجة ملفات متعددة
+for file in *.pdf; do
+    markpdfdown --input "$file" --output "${file%.pdf}.md"
+done
 ```
 
 <div dir="rtl">
@@ -105,7 +190,20 @@ python main.py page_start page_end < tests/input.pdf > output.md
 </div>
 
 ```bash
-docker run -i -e OPENAI_API_KEY=your-api-key -e OPENAI_API_BASE=your-api-base -e OPENAI_DEFAULT_MODEL=your-model jorbenzhu/markpdfdown < input.pdf > output.md
+# بناء الصورة (إذا لزم الأمر)
+docker build -t markpdfdown .
+
+# التشغيل مع متغيرات البيئة
+docker run -i \
+  -e MODEL_NAME=gpt-4o \
+  -e OPENAI_API_KEY=your-api-key \
+  markpdfdown < input.pdf > output.md
+
+# استخدام OpenRouter
+docker run -i \
+  -e MODEL_NAME=openrouter/anthropic/claude-3.5-sonnet \
+  -e OPENROUTER_API_KEY=your-openrouter-key \
+  markpdfdown < input.pdf > output.md
 ```
 
 <div dir="rtl">
@@ -165,7 +263,28 @@ ruff check --fix
 - Python 3.9+
 - [uv](https://astral.sh/uv/) (موصى به لإدارة الحزم) أو conda/pip
 - التبعيات المحددة في `pyproject.toml`
-- الوصول إلى نموذج الذكاء الاصطناعي متعدد الوسائط المحدد
+- الوصول إلى مزودي LLM المدعومين (OpenAI أو OpenRouter)
+
+## البنية المعمارية
+
+يتبع المشروع بنية معمارية نمطية:
+
+</div>
+
+```
+src/markpdfdown/
+├── __init__.py          # تهيئة الحزمة
+├── __main__.py          # نقطة الدخول لـ python -m
+├── cli.py               # واجهة سطر الأوامر
+├── main.py              # منطق التحويل الأساسي
+├── config.py            # إدارة التكوين
+└── core/                # الوحدات الأساسية
+    ├── llm_client.py    # تكامل LiteLLM
+    ├── file_worker.py   # معالجة الملفات
+    └── utils.py         # الوظائف المساعدة
+```
+
+<div dir="rtl">
 
 ## المساهمة
 نرحب بالمساهمات! لا تتردد في إرسال طلب سحب.
@@ -201,10 +320,23 @@ ruff check --fix
 
 يرجى التأكد من أن الكود الخاص بك يتبع معايير الترميز الخاصة بالمشروع عن طريق تشغيل أدوات التحقق والتنسيق قبل الإرسال.
 
+## سجل التغييرات
+
+### الإصدار 1.1.0 (الأحدث)
+- **تغييرات جذرية**: إعادة هيكلة كاملة للبنية المعمارية
+- **جديد**: تكامل LiteLLM لدعم متعدد المزودين
+- **جديد**: واجهة سطر أوامر موحدة مع معلمات `--input`/`--output`
+- **جديد**: دعم تنفيذ `python -m markpdfdown`
+- **جديد**: تكوين قائم على البيئة مع دعم `.env`
+- **جديد**: دعم OpenRouter إلى جانب OpenAI
+- **تحسين**: قاعدة شيفرة نمطية مع فصل أفضل للمسؤوليات
+- **تحسين**: تحسين معالجة الأخطاء والتسجيل
+
 ## الترخيص
 هذا المشروع مرخص بموجب Apache License 2.0. راجع ملف LICENSE للحصول على التفاصيل.
 
 ## شكر وتقدير
+- شكرًا لمطوري LiteLLM لتوفير وصول موحد إلى LLM
 - شكرًا لمطوري نماذج الذكاء الاصطناعي متعددة الوسائط التي تدعم هذه الأداة
 - مستوحى من الحاجة إلى أدوات أفضل لتحويل PDF إلى Markdown
 

@@ -15,15 +15,17 @@
 
 ## Обзор
 
-MarkPDFDown разработан для упрощения процесса преобразования PDF-документов в чистый, редактируемый текст Markdown. Используя передовые мультимодальные модели ИИ, он может точно извлекать текст, сохранять форматирование и обрабатывать сложные структуры документов, включая таблицы, формулы и диаграммы.
+MarkPDFDown разработан для упрощения процесса преобразования PDF-документов в чистый, редактируемый текст Markdown. Используя передовые мультимодальные модели ИИ через LiteLLM, он может точно извлекать текст, сохранять форматирование и обрабатывать сложные структуры документов, включая таблицы, формулы и диаграммы.
 
 ## Возможности
 
 - **Преобразование PDF в Markdown**: Преобразование любого PDF-документа в хорошо отформатированный Markdown
 - **Преобразование изображения в Markdown**: Преобразование изображения в хорошо отформатированный Markdown
-- **Мультимодальное понимание**: Использует ИИ для понимания структуры и содержания документа
+- **Поддержка нескольких провайдеров**: Поддержка OpenAI и OpenRouter через LiteLLM
+- **Гибкий CLI**: Режимы использования на основе файлов и на основе конвейера
 - **Сохранение формата**: Сохраняет заголовки, списки, таблицы и другие элементы форматирования
-- **Настраиваемая модель**: Настройте модель в соответствии с вашими потребностями
+- **Выбор диапазона страниц**: Преобразование определенных диапазонов страниц из PDF-документов
+- **Модульная архитектура**: Чистая, поддерживаемая кодовая база с разделением ответственности
 
 ## Демонстрация
 ![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/demo_02.png)
@@ -43,6 +45,8 @@ cd markpdfdown
 # Установите зависимости и создайте виртуальное окружение
 uv sync
 
+# Установите пакет в режиме разработки
+uv pip install -e .
 ```
 
 ### Использование conda
@@ -58,29 +62,106 @@ cd markpdfdown
 # Установите зависимости
 pip install -e .
 ```
-## Использование
+
+## Конфигурация
+
+MarkPDFDown использует переменные окружения для конфигурации. Создайте файл `.env` в директории вашего проекта:
+
 ```bash
-# Настройте ваш OpenAI API ключ
-export OPENAI_API_KEY="your-api-key"
-# Опционально, настройте базу OpenAI API
-export OPENAI_API_BASE="your-api-base"
-# Опционально, настройте модель OpenAI API
-export OPENAI_DEFAULT_MODEL="your-model"
-
-# PDF в Markdown
-python main.py < tests/input.pdf > output.md
-
-# Изображение в Markdown
-python main.py < input_image.png > output.md
+# Скопируйте образец конфигурации
+cp .env.sample .env
 ```
-## Расширенное использование
+
+Отредактируйте файл `.env` с вашими настройками:
+
 ```bash
-python main.py page_start page_end < tests/input.pdf > output.md
+# Конфигурация модели
+MODEL_NAME=gpt-4o
+
+# API ключи (LiteLLM автоматически определяет их)
+OPENAI_API_KEY=your-openai-api-key
+# или для OpenRouter
+OPENROUTER_API_KEY=your-openrouter-api-key
+
+# Опциональные параметры
+TEMPERATURE=0.3
+MAX_TOKENS=8192
+RETRY_TIMES=3
+```
+
+### Поддерживаемые модели
+
+#### Модели OpenAI
+```bash
+MODEL_NAME=gpt-4o
+MODEL_NAME=gpt-4o-mini
+MODEL_NAME=gpt-4-vision-preview
+```
+
+#### Модели OpenRouter
+```bash
+MODEL_NAME=openrouter/anthropic/claude-3.5-sonnet
+MODEL_NAME=openrouter/google/gemini-pro-vision
+MODEL_NAME=openrouter/meta-llama/llama-3.2-90b-vision
+```
+
+## Использование
+
+### Файловый режим (Рекомендуется)
+
+```bash
+# Базовое преобразование
+markpdfdown --input document.pdf --output output.md
+
+# Преобразование определенного диапазона страниц
+markpdfdown --input document.pdf --output output.md --start 1 --end 10
+
+# Преобразование изображения в markdown
+markpdfdown --input image.png --output output.md
+
+# Использование python модуля
+python -m markpdfdown --input document.pdf --output output.md
+```
+
+### Режим конвейера (Удобно для Docker)
+
+```bash
+# PDF в markdown через конвейер
+markpdfdown < document.pdf > output.md
+
+# Использование python модуля
+python -m markpdfdown < document.pdf > output.md
+```
+
+### Расширенное использование
+
+```bash
+# Преобразование страниц 5-15 PDF
+markpdfdown --input large_document.pdf --output chapter.md --start 5 --end 15
+
+# Обработка нескольких файлов
+for file in *.pdf; do
+    markpdfdown --input "$file" --output "${file%.pdf}.md"
+done
 ```
 
 ## Использование Docker
+
 ```bash
-docker run -i -e OPENAI_API_KEY=your-api-key -e OPENAI_API_BASE=your-api-base -e OPENAI_DEFAULT_MODEL=your-model jorbenzhu/markpdfdown < input.pdf > output.md
+# Соберите образ (при необходимости)
+docker build -t markpdfdown .
+
+# Запустите с переменными окружения
+docker run -i \
+  -e MODEL_NAME=gpt-4o \
+  -e OPENAI_API_KEY=your-api-key \
+  markpdfdown < input.pdf > output.md
+
+# Использование OpenRouter
+docker run -i \
+  -e MODEL_NAME=openrouter/anthropic/claude-3.5-sonnet \
+  -e OPENROUTER_API_KEY=your-openrouter-key \
+  markpdfdown < input.pdf > output.md
 ```
 
 ## Настройка разработки
@@ -126,7 +207,24 @@ ruff check --fix
 - Python 3.9+
 - [uv](https://astral.sh/uv/) (рекомендуется для управления пакетами) или conda/pip
 - Зависимости, указанные в `pyproject.toml`
-- Доступ к указанной мультимодальной модели ИИ
+- Доступ к поддерживаемым провайдерам LLM (OpenAI или OpenRouter)
+
+## Архитектура
+
+Проект следует модульной архитектуре:
+
+```
+src/markpdfdown/
+├── __init__.py          # Инициализация пакета
+├── __main__.py          # Точка входа для python -m
+├── cli.py               # Интерфейс командной строки
+├── main.py              # Основная логика преобразования
+├── config.py            # Управление конфигурацией
+└── core/                # Основные модули
+    ├── llm_client.py    # Интеграция LiteLLM
+    ├── file_worker.py   # Обработка файлов
+    └── utils.py         # Служебные функции
+```
 
 ## Вклад в проект
 Вклады приветствуются! Пожалуйста, не стесняйтесь отправлять Pull Request.
@@ -150,10 +248,23 @@ ruff check --fix
 
 Пожалуйста, убедитесь, что ваш код соответствует стандартам кодирования проекта, запустив инструменты линтинга и форматирования перед отправкой.
 
+## Журнал изменений
+
+### v1.1.0 (Последняя)
+- **Критические изменения**: Полный рефакторинг архитектуры
+- **Новое**: Интеграция LiteLLM для поддержки нескольких провайдеров
+- **Новое**: Унифицированный CLI с параметрами `--input`/`--output`
+- **Новое**: Поддержка выполнения `python -m markpdfdown`
+- **Новое**: Конфигурация на основе окружения с поддержкой `.env`
+- **Новое**: Поддержка OpenRouter наряду с OpenAI
+- **Улучшено**: Модульная кодовая база с лучшим разделением ответственности
+- **Улучшено**: Расширенная обработка ошибок и логирование
+
 ## Лицензия
 Этот проект лицензирован под Apache License 2.0. Подробности смотрите в файле LICENSE.
 
 ## Благодарности
+- Спасибо разработчикам LiteLLM за предоставление унифицированного доступа к LLM
 - Спасибо разработчикам мультимодальных моделей ИИ, которые поддерживают этот инструмент
 - Вдохновлен необходимостью в лучших инструментах преобразования PDF в Markdown
 

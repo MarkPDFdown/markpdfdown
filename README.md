@@ -248,18 +248,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 Please ensure your code follows the project's coding standards by running the linting and formatting tools before submitting.
 
-## Changelog
-
-### v1.1.0 (Latest)
-- **Breaking Changes**: Complete architecture refactor
-- **New**: LiteLLM integration for multi-provider support
-- **New**: Unified CLI with `--input`/`--output` parameters
-- **New**: Support for `python -m markpdfdown` execution
-- **New**: Environment-based configuration with `.env` support
-- **New**: OpenRouter support alongside OpenAI
-- **Improved**: Modular codebase with better separation of concerns
-- **Improved**: Enhanced error handling and logging
-
 ## License
 This project is licensed under the Apache License 2.0. See the LICENSE file for details.
 

@@ -1,4 +1,4 @@
-name: build image
+name: build image for Release
 
 on:
   workflow_dispatch:

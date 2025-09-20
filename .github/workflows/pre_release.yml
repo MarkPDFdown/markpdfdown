@@ -1,4 +1,4 @@
-name: build image
+name: build image for PreRelease
 
 on:
   workflow_dispatch:

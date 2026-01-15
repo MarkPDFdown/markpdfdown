@@ -15,3 +15,13 @@ repos:
       - id: check-toml
       - id: check-merge-conflict
       - id: check-added-large-files
+
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: uv run pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]

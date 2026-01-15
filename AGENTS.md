@@ -162,7 +162,18 @@ markpdfdown/
 │       ├── llm_client.py  # LLMClient for API calls
 │       └── utils.py       # Utility functions
 ├── tests/
-│   └── cases/             # Test fixtures (images, PDFs, expected outputs)
+│   ├── __init__.py        # Tests package init
+│   ├── conftest.py        # Pytest fixtures and configuration
+│   ├── test_cli.py        # CLI module tests
+│   ├── test_config.py     # Config module tests
+│   ├── test_file_worker.py # FileWorker tests
+│   ├── test_llm_client.py # LLMClient tests (mocked)
+│   ├── test_main.py       # Main conversion tests (mocked)
+│   ├── test_utils.py      # Utility function tests
+│   └── fixtures/          # Test fixtures
+│       ├── images/        # Test images
+│       ├── pdfs/          # Test PDFs
+│       └── expected/      # Expected outputs
 └── pyproject.toml         # Project configuration
 ```
 

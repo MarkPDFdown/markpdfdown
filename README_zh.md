@@ -9,7 +9,7 @@
 [![License]][license_url]
 <p>一个强大的工具，利用多模态大语言模型将PDF文件转录为Markdown格式。</p>
 
-![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/markpdfdown.png)
+![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/markpdfdown.png)
 
 </div>
 
@@ -28,7 +28,7 @@ MarkPDFDown 旨在简化将PDF文档转换为干净、可编辑的Markdown文本
 - **模块化架构**：清洁、可维护的代码库，关注点分离
 
 ## 演示
-![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/demo_02.png)
+![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/demo_02.png)
 
 ## 安装
 

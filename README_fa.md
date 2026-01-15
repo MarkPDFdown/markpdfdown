@@ -9,7 +9,7 @@
 [![License]][license_url]
 <p>ابزاری قدرتمند که از مدل‌های زبانی بزرگ چندوجهی برای تبدیل فایل‌های PDF به فرمت Markdown استفاده می‌کند.</p>
 
-![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/markpdfdown.png)
+![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/markpdfdown.png)
 
 </div>
 
@@ -30,7 +30,7 @@ MarkPDFDown برای ساده‌سازی فرآیند تبدیل اسناد PDF 
 - **معماری ماژولار**: کدبیس تمیز و قابل نگهداری با تفکیک دغدغه‌ها
 
 ## نمایش
-![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/demo_02.png)
+![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/demo_02.png)
 
 ## نصب
 

@@ -9,7 +9,7 @@
 [![License]][license_url]
 <p>A powerful tool that leverages multimodal large language models to transcribe PDF files into Markdown format.</p>
 
-![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/markpdfdown.png)
+![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/markpdfdown.png)
 
 </div>
 
@@ -28,7 +28,7 @@ MarkPDFDown is designed to simplify the process of converting PDF documents into
 - **Modular Architecture**: Clean, maintainable codebase with separation of concerns
 
 ## Demo
-![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/demo_02.png)
+![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/demo_02.png)
 
 ## Installation
 

@@ -9,7 +9,7 @@
 [![License]][license_url]
 <p>マルチモーダル大規模言語モデルを活用して、PDFファイルをMarkdown形式に変換する強力なツールです。</p>
 
-![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/markpdfdown.png)
+![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/markpdfdown.png)
 
 </div>
 
@@ -28,7 +28,7 @@ MarkPDFDownは、PDF文書をクリーンで編集可能なMarkdownテキスト�
 - **モジュラーアーキテクチャ**: 関心の分離による清潔で保守性の高いコードベース
 
 ## デモ
-![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/demo_02.png)
+![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/demo_02.png)
 
 ## インストール
 

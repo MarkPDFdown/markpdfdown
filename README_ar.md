@@ -9,7 +9,7 @@
 [![License]][license_url]
 <p>أداة قوية تستخدم نماذج اللغة الكبيرة متعددة الوسائط لتحويل ملفات PDF إلى تنسيق Markdown.</p>
 
-![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/markpdfdown.png)
+![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/markpdfdown.png)
 
 </div>
 
@@ -30,7 +30,7 @@
 - **بنية معمارية نمطية**: قاعدة شيفرة نظيفة وقابلة للصيانة مع فصل المسؤوليات
 
 ## عرض توضيحي
-![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/demo_02.png)
+![](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/demo_02.png)
 
 ## التثبيت
 

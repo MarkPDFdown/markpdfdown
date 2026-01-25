@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.2.0] - 2026-01-25
+### :white_check_mark: Tests
+- [`6c2b613`](https://github.com/MarkPDFdown/markpdfdown/commit/6c2b613a5fad6eeff886c9486b9b265926271c92) - add comprehensive unit test suite for all core modules *(commit by [@jorben](https://github.com/jorben))*
+
+### :wrench: Chores
+- [`d7e6982`](https://github.com/MarkPDFdown/markpdfdown/commit/d7e6982c30032483fd4a595d67dac3dfa5fff295) - update action name *(commit by [@jorben](https://github.com/jorben))*
+- [`2e34a1b`](https://github.com/MarkPDFdown/markpdfdown/commit/2e34a1b0b0a1f4e60b53164bd85988a3b399f06b) - 🔧 remove obsolete CodeBuddy plan file *(commit by [@jorben](https://github.com/jorben))*
+
+
 ## [1.1.2] - 2025-09-20
 ### :bug: Bug Fixes
 - [`c5d1a6a`](https://github.com/MarkPDFdown/markpdfdown/commit/c5d1a6a02c4e89e7b609dd3df275f13659b2d917) - Fix missing RUST compiler issue when building fastuuid in CI environment *(commit by [@jorben](https://github.com/jorben))*
@@ -106,3 +115,4 @@
 
 
 [1.1.2]: https://github.com/MarkPDFdown/markpdfdown/compare/1.1.1...1.1.2
+[1.2.0]: https://github.com/MarkPDFdown/markpdfdown/compare/1.1.2...1.2.0

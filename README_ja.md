@@ -9,8 +9,6 @@
 [![License]][license_url]
 <p>マルチモーダル大規模言語モデルを活用して、PDFファイルをMarkdown形式に変換する強力なツールです。</p>
 
-![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/markpdfdown.png)
-
 </div>
 
 ## デスクトップアプリ

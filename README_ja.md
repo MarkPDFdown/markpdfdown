@@ -13,6 +13,18 @@
 
 </div>
 
+## デスクトップアプリ
+
+**GUIをお探しですか？** より使いやすい体験のために、デスクトップアプリケーションをお試しください！
+
+```bash
+npx -y markpdfdown
+```
+
+![デスクトップアプリのスクリーンショット](https://github.com/user-attachments/assets/b7b67da2-96f9-400c-ae2a-4d2f5d050bbf)
+
+[デスクトップアプリのリポジトリを見る](https://github.com/MarkPDFdown/markpdfdown-desktop)
+
 ## 概要
 
 MarkPDFDownは、PDF文書をクリーンで編集可能なMarkdownテキストに変換するプロセスを簡素化するために設計されています。LiteLLMを通じて高度なマルチモーダルAIモデルを活用することで、テキストを正確に抽出し、書式を保持し、表、数式、図表を含む複雑な文書構造を処理できます。

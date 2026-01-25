@@ -9,9 +9,19 @@
 [![License]][license_url]
 <p>一个强大的工具，利用多模态大语言模型将PDF文件转录为Markdown格式。</p>
 
-![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/markpdfdown.png)
-
 </div>
+
+## 桌面应用
+
+**想要图形界面？** 试试我们的桌面应用，获得更友好的使用体验！
+
+```bash
+npx -y markpdfdown
+```
+
+![桌面应用截图](https://github.com/user-attachments/assets/b7b67da2-96f9-400c-ae2a-4d2f5d050bbf)
+
+[查看桌面应用仓库](https://github.com/MarkPDFdown/markpdfdown-desktop)
 
 ## 概述
 

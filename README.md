@@ -13,6 +13,18 @@
 
 </div>
 
+## Desktop App
+
+**Want a GUI?** Try our desktop application for a more user-friendly experience!
+
+```bash
+npx -y markpdfdown
+```
+
+![Desktop App Screenshot](https://github.com/user-attachments/assets/b7b67da2-96f9-400c-ae2a-4d2f5d050bbf)
+
+[View Desktop App Repository](https://github.com/MarkPDFdown/markpdfdown-desktop)
+
 ## Overview
 
 MarkPDFDown is designed to simplify the process of converting PDF documents into clean, editable Markdown text. By utilizing advanced multimodal AI models through LiteLLM, it can accurately extract text, preserve formatting, and handle complex document structures including tables, formulas, and diagrams.

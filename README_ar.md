@@ -9,8 +9,6 @@
 [![License]][license_url]
 <p>أداة قوية تستخدم نماذج اللغة الكبيرة متعددة الوسائط لتحويل ملفات PDF إلى تنسيق Markdown.</p>
 
-![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/markpdfdown.png)
-
 </div>
 
 <div dir="rtl">

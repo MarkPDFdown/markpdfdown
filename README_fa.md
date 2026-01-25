@@ -9,8 +9,6 @@
 [![License]][license_url]
 <p>ابزاری قدرتمند که از مدل‌های زبانی بزرگ چندوجهی برای تبدیل فایل‌های PDF به فرمت Markdown استفاده می‌کند.</p>
 
-![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/markpdfdown.png)
-
 </div>
 
 <div dir="rtl">

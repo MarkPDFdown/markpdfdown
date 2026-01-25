@@ -9,8 +9,6 @@
 [![License]][license_url]
 <p>Мощный инструмент, использующий мультимодальные большие языковые модели для преобразования PDF-файлов в формат Markdown.</p>
 
-![markpdfdown](https://raw.githubusercontent.com/markpdfdown/markpdfdown/refs/heads/master/tests/fixtures/images/markpdfdown.png)
-
 </div>
 
 ## Настольное приложение

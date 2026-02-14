@@ -1,0 +1,23 @@
+{
+  "name": "pdf2md",
+  "version": "1.0.0",
+  "description": "Convert PDF files to Markdown format using Claude Code",
+  "author": "MarkPDFDown",
+  "main": "pdf2md.py",
+  "dependencies": {
+    "pymupdf": ">=1.25.3",
+    "pypdf2": ">=3.0.1"
+  },
+  "commands": {
+    "pdf2md": {
+      "description": "Convert PDF to Markdown",
+      "usage": "pdf2md <input_pdf> [options]",
+      "options": {
+        "--output": "Output markdown file path (default: <input>.md)",
+        "--start": "Start page number (1-based, default: 1)",
+        "--end": "End page number (default: last page)",
+        "--dpi": "Image resolution for conversion (default: 300)"
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+name: pdf2md
+version: 1.0.0
+description: Convert PDF files to Markdown format using Claude Code's vision capabilities
+author: MarkPDFDown
+
+# Skill metadata
+metadata:
+  category: document-processing
+  tags:
+    - pdf
+    - markdown
+    - conversion
+    - vision
+  requires:
+    - python3
+    - pymupdf
+    - pypdf2
+
+# Command definition
+command:
+  name: pdf2md
+  description: Convert PDF to Markdown
+  usage: |
+    /pdf2md <input_pdf> [options]
+
+    Options:
+      --output <file>    Output markdown file (default: <input>.md)
+      --start <num>      Start page number (default: 1)
+      --end <num>        End page number (default: last page)
+      --dpi <num>        Image resolution (default: 300)
+
+  examples:
+    - description: Convert entire PDF
+      command: /pdf2md document.pdf
+
+    - description: Convert specific page range
+      command: /pdf2md document.pdf --start 1 --end 10
+
+    - description: Convert with custom output
+      command: /pdf2md document.pdf --output my_notes.md
+
+# Main prompt that will be executed
+prompt_file: skill_main.md
+
+# Additional resources
+resources:
+  - conversion_prompt.md
+  - pdf2md.py

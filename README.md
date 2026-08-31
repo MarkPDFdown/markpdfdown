@@ -87,11 +87,17 @@ Edit the `.env` file with your settings:
 ```bash
 # Model Configuration
 MODEL_NAME=gpt-4o
+# Optional Fallback Models (automatically failover on rate limits or errors)
+FALLBACK_MODELS=openrouter/anthropic/claude-3.5-sonnet,openrouter/google/gemini-pro-vision
 
 # API Keys (LiteLLM automatically detects these)
 OPENAI_API_KEY=your-openai-api-key
 # or for OpenRouter
 OPENROUTER_API_KEY=your-openrouter-api-key
+
+# Optional Checkpoint & Resume
+# CACHE_DIR=~/.cache/markpdfdown
+# RESUME=true
 
 # Optional Parameters
 TEMPERATURE=0.3
@@ -143,9 +149,15 @@ markpdfdown < document.pdf > output.md
 python -m markpdfdown < document.pdf > output.md
 ```
 
-### Advanced Usage
+### Advanced Usage & Model Switching
 
 ```bash
+# Specify primary model and automatic fallback chain
+markpdfdown --input doc.pdf --output out.md -m gpt-4o --fallback-models "openrouter/anthropic/claude-3.5-sonnet,openrouter/google/gemini-2.0-flash"
+
+# Resume a previous partial run (automatically reuses finished pages from cache)
+markpdfdown --input doc.pdf --output out.md -m openrouter/anthropic/claude-3.5-sonnet --cache-dir .cache
+
 # Convert pages 5-15 of a PDF
 markpdfdown --input large_document.pdf --output chapter.md --start 5 --end 15
 
@@ -154,7 +166,6 @@ for file in *.pdf; do
     markpdfdown --input "$file" --output "${file%.pdf}.md"
 done
 ```
-
 ## Docker Usage
 
 ```bash

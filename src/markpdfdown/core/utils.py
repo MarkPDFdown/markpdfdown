@@ -2,6 +2,7 @@
 Utility functions for MarkPDFDown
 """
 
+import hashlib
 import re
 from typing import Optional
 
@@ -68,6 +69,19 @@ def detect_file_type(file_data: bytes) -> Optional[str]:
         return ".gif"
 
     return None
+
+
+def compute_file_hash(data: bytes) -> str:
+    """
+    Compute SHA-256 hash of binary data.
+
+    Args:
+        data: Binary content
+
+    Returns:
+        Hexadecimal hash string
+    """
+    return hashlib.sha256(data).hexdigest()
 
 
 def validate_page_range(

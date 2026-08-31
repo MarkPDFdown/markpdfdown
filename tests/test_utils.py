@@ -2,9 +2,12 @@
 Tests for markpdfdown.core.utils module
 """
 
+import hashlib
+
 import pytest
 
 from markpdfdown.core.utils import (
+    compute_file_hash,
     detect_file_type,
     remove_markdown_wrap,
     validate_page_range,
@@ -157,3 +160,18 @@ class TestValidatePageRange:
         start, end = validate_page_range(10, 10, 10)
         assert start == 10
         assert end == 10
+
+
+class TestComputeFileHash:
+    """Tests for compute_file_hash function"""
+
+    def test_compute_file_hash_deterministic(self):
+        """Test hash computation is deterministic and correct"""
+        data = b"Hello, MarkPDFDown!"
+        expected = hashlib.sha256(data).hexdigest()
+        assert compute_file_hash(data) == expected
+
+    def test_compute_file_hash_empty_data(self):
+        """Test hash computation on empty data"""
+        expected = hashlib.sha256(b"").hexdigest()
+        assert compute_file_hash(b"") == expected

@@ -226,6 +226,57 @@ class TestConvertToMarkdown:
         )
         assert "# Content" in result
 
+    @patch("markpdfdown.main.LLMClient")
+    @patch("markpdfdown.main.create_worker")
+    def test_convert_resume_skips_cached_pages(
+        self, mock_create_worker, mock_llm_class, tmp_path
+    ):
+        """Test that already completed pages are loaded from cache without calling LLM"""
+        cache_dir = tmp_path / "cache"
+        page1 = tmp_path / "page_01.png"
+        page2 = tmp_path / "page_02.png"
+        page1.write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x00" * 50)
+        page2.write_bytes(b"\x89PNG\r\n\x1a\n" + b"\x00" * 50)
+
+        mock_worker = MagicMock()
+        mock_worker.convert_to_images.return_value = [str(page1), str(page2)]
+        mock_create_worker.return_value = mock_worker
+
+        mock_llm = MagicMock()
+        # Only page2 should need to be converted
+        mock_llm.completion.return_value = "# Page 2 Content"
+        mock_llm_class.return_value = mock_llm
+
+        input_data = b"%PDF-1.4 mock pdf content"
+        from markpdfdown.core.utils import compute_file_hash
+
+        file_hash = compute_file_hash(input_data)
+        doc_cache = cache_dir / file_hash
+        doc_cache.mkdir(parents=True)
+        # Pre-seed page_01.png.md in cache
+        (doc_cache / "page_01.png.md").write_text(
+            "# Page 1 Cached Content", encoding="utf-8"
+        )
+
+        result = convert_to_markdown(
+            input_data,
+            input_filename="test.pdf",
+            cache_dir=str(cache_dir),
+            resume=True,
+            cleanup=False,
+        )
+
+        # Page 1 was read from cache, Page 2 was completed by LLM
+        assert "# Page 1 Cached Content" in result
+        assert "# Page 2 Content" in result
+        # LLM completion should only be called once (for page 2)
+        assert mock_llm.completion.call_count == 1
+        # Page 2 should now also be cached
+        assert (doc_cache / "page_02.png.md").exists()
+        assert (doc_cache / "page_02.png.md").read_text(
+            encoding="utf-8"
+        ) == "# Page 2 Content"
+
 
 class TestConvertFromFile:
     """Tests for convert_from_file function"""

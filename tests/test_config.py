@@ -15,6 +15,9 @@ class TestConfig:
         """Test default configuration values"""
         config = Config()
         assert config.model_name == "gpt-4o"
+        assert config.fallback_models == []
+        assert config.cache_dir is None
+        assert config.resume is True
         assert config.temperature == 0.3
         assert config.max_tokens == 8192
         assert config.retry_times == 3
@@ -117,3 +120,17 @@ class TestConfigFromEnv:
 
         config = Config.from_env()
         assert config.model_name == "openrouter/anthropic/claude-3.5-sonnet"
+
+    def test_from_env_fallback_models_and_cache(self, monkeypatch):
+        """Test from_env with FALLBACK_MODELS, CACHE_DIR, and RESUME"""
+        monkeypatch.setenv("FALLBACK_MODELS", "claude-3-5-sonnet, gemini-2.0-flash ")
+        monkeypatch.setenv("CACHE_DIR", "/custom/cache")
+        monkeypatch.setenv("RESUME", "false")
+
+        config = Config.from_env()
+        assert config.fallback_models == [
+            "claude-3-5-sonnet",
+            "gemini-2.0-flash",
+        ]
+        assert config.cache_dir == "/custom/cache"
+        assert config.resume is False

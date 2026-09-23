@@ -15,19 +15,26 @@ logger = logging.getLogger(__name__)
 
 class LLMClient:
     """
-    Unified LLM client using LiteLLM
-    Supports OpenAI and OpenRouter automatically
+    Unified LLM client using LiteLLM.
+    Supports OpenAI, OpenRouter, Anthropic, Gemini, Ollama, etc.
+    Supports fallback models when rate limits or errors occur.
     """
 
-    def __init__(self, model_name: str):
+    def __init__(
+        self,
+        model_name: str,
+        fallback_models: Optional[list[str]] = None,
+    ):
         """
-        Initialize LLM client
+        Initialize LLM client.
 
         Args:
-            model_name: Model name (e.g., "gpt-4o", "openrouter/anthropic/claude-3.5-sonnet")
+            model_name: Primary model name (e.g., "gpt-4o")
+            fallback_models: Optional list of fallback model names to try if primary fails
         """
         self.model_name = model_name
-
+        self.fallback_models = fallback_models or []
+        self.active_model = model_name
         # Configure LiteLLM logging
         litellm.set_verbose = False
 
@@ -73,35 +80,53 @@ class LLMClient:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": user_content})
 
-        # Retry mechanism
-        for attempt in range(retry_times):
-            try:
-                response = completion(
-                    model=self.model_name,
-                    messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    # Add custom headers for tracking
-                    extra_headers={
-                        "X-Title": "MarkPDFdown",
-                        "HTTP-Referer": "https://github.com/MarkPDFdown/markpdfdown.git",
-                    },
-                )
+        # Candidate model chain: active model first, then remaining fallback models
+        models_to_try = [self.active_model] + [
+            m for m in self.fallback_models if m != self.active_model
+        ]
 
-                if not response.choices:
-                    raise Exception("No response from API")
+        last_exception: Optional[Exception] = None
 
-                return response.choices[0].message.content
+        for model in models_to_try:
+            for attempt in range(retry_times):
+                try:
+                    response = completion(
+                        model=model,
+                        messages=messages,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                        extra_headers={
+                            "X-Title": "MarkPDFdown",
+                            "HTTP-Referer": "https://github.com/MarkPDFdown/markpdfdown.git",
+                        },
+                    )
 
-            except Exception as e:
-                logger.error(
-                    f"API request failed (attempt {attempt + 1}/{retry_times}): {str(e)}"
-                )
-                if attempt < retry_times - 1:
-                    # Wait before retry
-                    time.sleep(0.5 * (attempt + 1))
-                else:
-                    raise e
+                    if not response.choices:
+                        raise Exception(f"No response from API for model {model}")
+
+                    # Switch active model to this working model for future calls
+                    if self.active_model != model:
+                        logger.info(
+                            f"Switched active model from {self.active_model} to fallback model: {model}"
+                        )
+                        self.active_model = model
+
+                    return response.choices[0].message.content
+
+                except Exception as e:
+                    last_exception = e
+                    logger.warning(
+                        f"API request failed on model '{model}' (attempt {attempt + 1}/{retry_times}): {e}"
+                    )
+                    if attempt < retry_times - 1:
+                        time.sleep(0.5 * (attempt + 1))
+
+            logger.warning(f"All {retry_times} retries failed for model '{model}'.")
+            if model != models_to_try[-1]:
+                logger.info(f"Falling back from '{model}' to next candidate model...")
+
+        if last_exception:
+            raise last_exception
 
         return ""
 

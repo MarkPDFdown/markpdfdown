@@ -12,7 +12,7 @@ from typing import Optional
 from .config import config
 from .core.file_worker import create_worker
 from .core.llm_client import LLMClient
-from .core.utils import detect_file_type, remove_markdown_wrap
+from .core.utils import compute_file_hash, detect_file_type, remove_markdown_wrap
 
 logger = logging.getLogger(__name__)
 
@@ -70,9 +70,13 @@ def convert_to_markdown(
     input_filename: Optional[str] = None,
     output_dir: Optional[str] = None,
     cleanup: bool = True,
+    model_name: Optional[str] = None,
+    fallback_models: Optional[list[str]] = None,
+    cache_dir: Optional[str] = None,
+    resume: bool = True,
 ) -> str:
     """
-    Convert PDF or image data to Markdown format
+    Convert PDF or image data to Markdown format.
 
     Args:
         input_data: Binary file data
@@ -81,6 +85,10 @@ def convert_to_markdown(
         input_filename: Original filename (for type detection)
         output_dir: Output directory (if None, creates temporary directory)
         cleanup: Whether to clean up temporary files
+        model_name: Primary LLM model name (defaults to config.model_name)
+        fallback_models: Optional list of fallback models
+        cache_dir: Directory to store/reuse converted pages (defaults to .cache/markpdfdown)
+        resume: Whether to reuse previously completed pages from cache
 
     Returns:
         Converted Markdown content
@@ -131,19 +139,47 @@ def convert_to_markdown(
 
         logger.info(f"Generated {len(img_paths)} images")
 
-        # Initialize LLM client
-        llm_client = LLMClient(config.model_name)
+        # Initialize LLM client with primary and fallback models
+        primary_model = model_name or config.model_name
+        effective_fallbacks = (
+            fallback_models if fallback_models is not None else config.fallback_models
+        )
+        llm_client = LLMClient(
+            model_name=primary_model, fallback_models=effective_fallbacks
+        )
 
-        # Convert images to markdown
+        # Set up cache directory if resume is enabled and cache_dir is provided
+        doc_cache_dir = None
+        effective_cache_dir = cache_dir if cache_dir is not None else config.cache_dir
+        if resume and effective_cache_dir:
+            file_hash = compute_file_hash(input_data)
+            doc_cache_dir = os.path.join(effective_cache_dir, file_hash)
+            os.makedirs(doc_cache_dir, exist_ok=True)
         markdown_parts = []
         for img_path in sorted(img_paths):
-            logger.info(f"Converting image: {os.path.basename(img_path)}")
-            content = convert_image_to_markdown(img_path, llm_client)
+            img_basename = os.path.basename(img_path)
+            cached_page_md = (
+                os.path.join(doc_cache_dir, f"{img_basename}.md")
+                if doc_cache_dir
+                else None
+            )
+
+            # Check if page was already completed in cache
+            if cached_page_md and os.path.exists(cached_page_md):
+                logger.info(f"Reusing cached page: {img_basename}")
+                with open(cached_page_md, encoding="utf-8") as f:
+                    content = f.read()
+            else:
+                logger.info(f"Converting image: {img_basename}")
+                content = convert_image_to_markdown(img_path, llm_client)
+                if content and cached_page_md:
+                    # Persist page markdown in cache
+                    with open(cached_page_md, "w", encoding="utf-8") as f:
+                        f.write(content)
+
             if content:
-                # Save individual page markdown (optional)
-                page_md_path = os.path.join(
-                    output_dir, f"{os.path.basename(img_path)}.md"
-                )
+                # Save individual page markdown in current output_dir
+                page_md_path = os.path.join(output_dir, f"{img_basename}.md")
                 with open(page_md_path, "w", encoding="utf-8") as f:
                     f.write(content)
 
@@ -169,9 +205,14 @@ def convert_to_markdown(
                 logger.warning(f"Failed to cleanup directory {output_dir}: {e}")
 
 
-def convert_from_stdin() -> str:
+def convert_from_stdin(
+    model_name: Optional[str] = None,
+    fallback_models: Optional[list[str]] = None,
+    cache_dir: Optional[str] = None,
+    resume: bool = True,
+) -> str:
     """
-    Convert file data from stdin to Markdown
+    Convert file data from stdin to Markdown.
 
     Returns:
         Converted Markdown content
@@ -186,17 +227,36 @@ def convert_from_stdin() -> str:
     if input_filename == "<stdin>":
         input_filename = None
 
-    return convert_to_markdown(input_data, input_filename=input_filename)
+    return convert_to_markdown(
+        input_data,
+        input_filename=input_filename,
+        model_name=model_name,
+        fallback_models=fallback_models,
+        cache_dir=cache_dir,
+        resume=resume,
+    )
 
 
-def convert_from_file(input_path: str, start_page: int = 1, end_page: int = 0) -> str:
+def convert_from_file(
+    input_path: str,
+    start_page: int = 1,
+    end_page: int = 0,
+    model_name: Optional[str] = None,
+    fallback_models: Optional[list[str]] = None,
+    cache_dir: Optional[str] = None,
+    resume: bool = True,
+) -> str:
     """
-    Convert file to Markdown
+    Convert file to Markdown.
 
     Args:
         input_path: Path to input file
         start_page: Starting page number
         end_page: Ending page number
+        model_name: Primary LLM model name
+        fallback_models: Optional list of fallback models
+        cache_dir: Directory to store/reuse converted pages
+        resume: Whether to reuse previously completed pages from cache
 
     Returns:
         Converted Markdown content
@@ -214,4 +274,8 @@ def convert_from_file(input_path: str, start_page: int = 1, end_page: int = 0) -
         end_page=end_page,
         input_filename=os.path.basename(input_path),
         cleanup=True,
+        model_name=model_name,
+        fallback_models=fallback_models,
+        cache_dir=cache_dir,
+        resume=resume,
     )

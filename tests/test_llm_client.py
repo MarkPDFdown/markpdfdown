@@ -142,6 +142,53 @@ class TestLLMClientCompletion:
                 with pytest.raises(Exception, match="No response from API"):
                     client.completion("Hello", retry_times=1)
 
+    def test_completion_fallback_to_second_model(self):
+        """Test completion switches to fallback model when primary model fails"""
+        with patch("markpdfdown.core.llm_client.completion") as mock_completion:
+            mock_response = MagicMock()
+            mock_response.choices = [MagicMock()]
+            mock_response.choices[0].message.content = "Fallback Success"
+
+            # First model fails on all retries, second model succeeds on first attempt
+            mock_completion.side_effect = [
+                Exception("Rate limit 429"),
+                Exception("Rate limit 429"),
+                mock_response,
+            ]
+
+            client = LLMClient(
+                model_name="gpt-4o",
+                fallback_models=["openrouter/anthropic/claude-3.5-sonnet"],
+            )
+            with patch("markpdfdown.core.llm_client.time.sleep"):
+                result = client.completion("Hello", retry_times=2)
+
+            assert result == "Fallback Success"
+            assert mock_completion.call_count == 3
+            # Verify that the active model was updated to the working fallback model
+            assert client.active_model == "openrouter/anthropic/claude-3.5-sonnet"
+            # Last call was made with fallback model
+            assert (
+                mock_completion.call_args_list[-1].kwargs["model"]
+                == "openrouter/anthropic/claude-3.5-sonnet"
+            )
+
+    def test_completion_all_fallback_models_fail_raises(self):
+        """Test completion raises exception if primary and all fallbacks fail"""
+        with patch("markpdfdown.core.llm_client.completion") as mock_completion:
+            mock_completion.side_effect = Exception("Quota exceeded")
+
+            client = LLMClient(
+                model_name="gpt-4o",
+                fallback_models=["claude-3-5-sonnet", "gemini-2.0-flash"],
+            )
+            with patch("markpdfdown.core.llm_client.time.sleep"):
+                with pytest.raises(Exception, match="Quota exceeded"):
+                    client.completion("Hello", retry_times=1)
+
+            # 3 models x 1 retry each = 3 calls
+            assert mock_completion.call_count == 3
+
 
 class TestLLMClientEncodeImage:
     """Tests for LLMClient._encode_image method"""

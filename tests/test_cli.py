@@ -101,6 +101,33 @@ class TestCreateParser:
         assert args.start == 1
         assert args.end == 0
 
+    def test_model_and_fallback_arguments(self):
+        """Test parsing --model and --fallback-models arguments"""
+        parser = create_parser()
+        args = parser.parse_args(
+            [
+                "-m",
+                "gpt-4o",
+                "--fallback-models",
+                "claude-3-5-sonnet,gemini-2.0-flash",
+            ]
+        )
+        assert args.model == "gpt-4o"
+        assert args.fallback_models == "claude-3-5-sonnet,gemini-2.0-flash"
+
+    def test_cache_and_resume_arguments(self):
+        """Test parsing --cache-dir and --no-resume arguments"""
+        parser = create_parser()
+        args = parser.parse_args(
+            [
+                "--cache-dir",
+                "/tmp/my_cache",
+                "--no-resume",
+            ]
+        )
+        assert args.cache_dir == "/tmp/my_cache"
+        assert args.no_resume is True
+
 
 class TestValidateArgs:
     """Tests for validate_args function"""
@@ -245,7 +272,13 @@ class TestMain:
             main()
 
         mock_convert.assert_called_once_with(
-            input_path=str(input_file), start_page=2, end_page=5
+            input_path=str(input_file),
+            start_page=2,
+            end_page=5,
+            model_name=None,
+            fallback_models=None,
+            cache_dir=None,
+            resume=True,
         )
 
     @patch("markpdfdown.cli.convert_from_stdin")
@@ -256,8 +289,53 @@ class TestMain:
         with patch.object(sys, "argv", ["markpdfdown"]):
             main()
 
+        mock_convert.assert_called_once_with(
+            model_name=None,
+            fallback_models=None,
+            cache_dir=None,
+            resume=True,
+        )
         captured = capsys.readouterr()
         assert "# Pipe Content" in captured.out
+
+    @patch("markpdfdown.cli.convert_from_file")
+    def test_file_mode_with_model_and_cache(self, mock_convert, tmp_path):
+        """Test file mode passes model, fallback models, and cache arguments"""
+        input_file = tmp_path / "input.pdf"
+        output_file = tmp_path / "output.md"
+        input_file.write_bytes(b"%PDF-1.4")
+
+        mock_convert.return_value = "# Model Content"
+
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "markpdfdown",
+                "-i",
+                str(input_file),
+                "-o",
+                str(output_file),
+                "-m",
+                "gemini-2.0-flash",
+                "--fallback-models",
+                "gpt-4o-mini,claude-3-5-sonnet",
+                "--cache-dir",
+                "/tmp/cache",
+                "--no-resume",
+            ],
+        ):
+            main()
+
+        mock_convert.assert_called_once_with(
+            input_path=str(input_file),
+            start_page=1,
+            end_page=0,
+            model_name="gemini-2.0-flash",
+            fallback_models=["gpt-4o-mini", "claude-3-5-sonnet"],
+            cache_dir="/tmp/cache",
+            resume=False,
+        )
 
     @patch("markpdfdown.cli.convert_from_file")
     def test_conversion_exception_exits(self, mock_convert, tmp_path):

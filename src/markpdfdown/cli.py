@@ -55,11 +55,40 @@ def create_parser() -> argparse.ArgumentParser:
         help="Ending page number (default: 0, means last page)",
     )
 
+    # Model options
+    parser.add_argument(
+        "--model",
+        "-m",
+        type=str,
+        default=None,
+        help="Primary LLM model name (e.g., gpt-4o, openrouter/anthropic/claude-3.5-sonnet)",
+    )
+
+    parser.add_argument(
+        "--fallback-models",
+        type=str,
+        default=None,
+        help="Comma-separated fallback model names to try if primary fails",
+    )
+
+    # Checkpoint and caching options
+    parser.add_argument(
+        "--cache-dir",
+        type=str,
+        default=None,
+        help="Directory to cache page conversions for resuming",
+    )
+
+    parser.add_argument(
+        "--no-resume",
+        action="store_true",
+        help="Disable reusing cached page conversions",
+    )
+
     # Version argument
     parser.add_argument(
         "--version", action="version", version=f"markpdfdown {__version__}"
     )
-
     return parser
 
 
@@ -115,8 +144,21 @@ def main() -> None:
                     f"Page range: {args.start} to {args.end if args.end != 0 else 'last'}"
                 )
 
+            # Parse fallback models
+            fallbacks = None
+            if args.fallback_models:
+                fallbacks = [
+                    m.strip() for m in args.fallback_models.split(",") if m.strip()
+                ]
+
             markdown_content = convert_from_file(
-                input_path=args.input, start_page=args.start, end_page=args.end
+                input_path=args.input,
+                start_page=args.start,
+                end_page=args.end,
+                model_name=args.model,
+                fallback_models=fallbacks,
+                cache_dir=args.cache_dir,
+                resume=not args.no_resume,
             )
 
             # Write output
@@ -129,13 +171,23 @@ def main() -> None:
             # Pipe mode: read from stdin, write to stdout
             logger.info("Reading from stdin, writing to stdout")
 
-            markdown_content = convert_from_stdin()
+            fallbacks = None
+            if args.fallback_models:
+                fallbacks = [
+                    m.strip() for m in args.fallback_models.split(",") if m.strip()
+                ]
+
+            markdown_content = convert_from_stdin(
+                model_name=args.model,
+                fallback_models=fallbacks,
+                cache_dir=args.cache_dir,
+                resume=not args.no_resume,
+            )
 
             # Write to stdout
             print(markdown_content)
 
             logger.info("Conversion completed")
-
     except KeyboardInterrupt:
         logger.info("Operation cancelled by user")
         sys.exit(1)

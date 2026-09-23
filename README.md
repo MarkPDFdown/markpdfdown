@@ -31,7 +31,7 @@ MarkPDFDown is designed to simplify the process of converting PDF documents into
 
 - **PDF to Markdown Conversion**: Transform any PDF document into well-formatted Markdown
 - **Image to Markdown Conversion**: Transform image into well-formatted Markdown
-- **Multi-Provider Support**: Supports OpenAI and OpenRouter through LiteLLM
+- **Multi-Provider Support**: Supports OpenAI, OpenRouter, and Requesty through LiteLLM
 - **Flexible CLI**: Both file-based and pipe-based usage modes
 - **Format Preservation**: Maintains headings, lists, tables, and other formatting elements
 - **Page Range Selection**: Convert specific page ranges from PDF documents
@@ -92,6 +92,8 @@ MODEL_NAME=gpt-4o
 OPENAI_API_KEY=your-openai-api-key
 # or for OpenRouter
 OPENROUTER_API_KEY=your-openrouter-api-key
+# or for Requesty
+REQUESTY_API_KEY=your-requesty-api-key
 
 # Optional Parameters
 TEMPERATURE=0.3
@@ -113,6 +115,13 @@ MODEL_NAME=gpt-4-vision-preview
 MODEL_NAME=openrouter/anthropic/claude-3.5-sonnet
 MODEL_NAME=openrouter/google/gemini-pro-vision
 MODEL_NAME=openrouter/meta-llama/llama-3.2-90b-vision
+```
+
+#### Requesty Models
+Get your API key at https://app.requesty.ai/api-keys
+```bash
+MODEL_NAME=requesty/openai/gpt-4o
+MODEL_NAME=requesty/anthropic/claude-sonnet-4-5
 ```
 
 ## Usage
@@ -171,6 +180,12 @@ docker run -i \
 docker run -i \
   -e MODEL_NAME=openrouter/anthropic/claude-3.5-sonnet \
   -e OPENROUTER_API_KEY=your-openrouter-key \
+  markpdfdown < input.pdf > output.md
+
+# Using Requesty
+docker run -i \
+  -e MODEL_NAME=requesty/openai/gpt-4o \
+  -e REQUESTY_API_KEY=your-requesty-key \
   markpdfdown < input.pdf > output.md
 ```
 

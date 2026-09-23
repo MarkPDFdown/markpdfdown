@@ -17,7 +17,7 @@ class Config(BaseModel):
     # Model configuration
     model_name: str = Field(
         default="gpt-4o",
-        description="LLM model name (e.g., gpt-4o, openrouter/anthropic/claude-3.5-sonnet)",
+        description="LLM model name (e.g., gpt-4o, openrouter/anthropic/claude-3.5-sonnet, requesty/openai/gpt-4o)",
     )
 
     # Generation parameters
